@@ -16,7 +16,7 @@ $dernieres_demandes = $pdo->query('SELECT * FROM demandes_projet ORDER BY date_d
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Tableau de bord</title>
-  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -24,9 +24,12 @@ $dernieres_demandes = $pdo->query('SELECT * FROM demandes_projet ORDER BY date_d
   <div class="main">
     <div class="topbar">
       <h1>Tableau de bord</h1>
-      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="<?= BASE_URL ?>/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
+      <div class="actions" style="margin-bottom:16px;">
+        <a href="<?= BASE_URL ?>/admin/utilisateurs/creer.php" class="btn btn-primary">+ Nouvel administrateur</a>
+      </div>
 
       <div class="stats-grid">
         <div class="stat-card">

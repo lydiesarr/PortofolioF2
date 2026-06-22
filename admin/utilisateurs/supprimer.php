@@ -16,7 +16,13 @@ if ($id === (int)$_SESSION['admin_id']) {
     exit;
 }
 
-// Le compte id=2 (Lydi Sarr) est protégé contre toute suppression
+// Seul le super admin (id=2) peut supprimer
+if ((int)$_SESSION['admin_id'] !== 2) {
+    header('Location: liste.php?error=forbidden');
+    exit;
+}
+
+// Le compte id=2 est protégé contre toute suppression
 if ($id === 2) {
     header('Location: liste.php?error=protected');
     exit;
@@ -47,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Supprimer un administrateur</title>
-  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -55,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="main">
     <div class="topbar">
       <h1>Supprimer un administrateur</h1>
-      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="<?= BASE_URL ?>/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
       <div class="form-block">

@@ -1,11 +1,16 @@
 <?php
 require_once '../../config/connexion.php';
 require_once '../../fonctions.php';
-verifier_session_admin();
 
-if ((int)$_SESSION['admin_id'] !== 2) {
-    header('Location: liste.php?error=forbidden');
-    exit;
+$adminCount = (int)$pdo->query('SELECT COUNT(*) FROM administrateurs')->fetchColumn();
+$firstAdminSetup = $adminCount === 0;
+
+if (!$firstAdminSetup) {
+    verifier_session_admin();
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
 if (empty($_SESSION['csrf_token'])) {
@@ -48,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Nouvel administrateur</title>
-  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -56,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="main">
     <div class="topbar">
       <h1>Nouvel administrateur</h1>
-      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="<?= BASE_URL ?>/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
       <?php if (!empty($erreurs)) : ?>

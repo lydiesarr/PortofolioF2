@@ -16,8 +16,6 @@ $page_courante = basename($_SERVER['PHP_SELF']);
       <span class="icon-sun">☀️</span>
       <span class="knob"></span>
     </button>
-    <button class="button">
-      <a href="fichiers/CV — Aissatou Lydi Sarr.pdf" class="CV-button" download>Curriculum Vitae</a>
-    </button>
+    <a href="#" class="button CV-button disabled" aria-disabled="true" onclick="return false;">Curriculum Vitae</a>
   </div>
 </nav>

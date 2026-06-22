@@ -3,14 +3,10 @@ require_once '../../config/connexion.php';
 require_once '../../fonctions.php';
 verifier_session_admin();
 
-// Seul le super admin voit la liste, les autres sont redirigés vers leur propre profil
-if ((int)$_SESSION['admin_id'] !== 2) {
-    header('Location: modifier.php?id=' . (int)$_SESSION['admin_id']);
-    exit;
-}
-
 $admins = $pdo->query('SELECT id, prenom, nom, email, date_creation FROM administrateurs ORDER BY date_creation ASC')->fetchAll();
 $succes = $_GET['deleted'] ?? $_GET['created'] ?? $_GET['updated'] ?? '';
+
+$can_add_admin = true;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,7 +14,7 @@ $succes = $_GET['deleted'] ?? $_GET['created'] ?? $_GET['updated'] ?? '';
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Administrateurs</title>
-  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
+  <link rel="stylesheet" href="<?= BASE_URL ?>/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -26,13 +22,13 @@ $succes = $_GET['deleted'] ?? $_GET['created'] ?? $_GET['updated'] ?? '';
   <div class="main">
     <div class="topbar">
       <h1>Administrateurs</h1>
-      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="<?= BASE_URL ?>/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
       <?php if ($succes) : ?>
         <div class="alert alert-success">Opération effectuée avec succès.</div>
       <?php endif; ?>
-      <?php if ((int)$_SESSION['admin_id'] === 2) : ?>
+      <?php if ($can_add_admin) : ?>
       <div class="actions">
         <a href="creer.php" class="btn btn-primary">+ Nouvel administrateur</a>
       </div>
@@ -51,7 +47,7 @@ $succes = $_GET['deleted'] ?? $_GET['created'] ?? $_GET['updated'] ?? '';
                 <?php if ((int)$_SESSION['admin_id'] === 2 || (int)$a['id'] === (int)$_SESSION['admin_id']) : ?>
                 <a href="modifier.php?id=<?= (int)$a['id'] ?>" class="btn btn-secondary btn-sm">Modifier</a>
                 <?php endif; ?>
-                <?php if ((int)$a['id'] !== (int)$_SESSION['admin_id'] && (int)$a['id'] !== 2) : ?>
+                <?php if ((int)$_SESSION['admin_id'] === 2 && (int)$a['id'] !== (int)$_SESSION['admin_id'] && (int)$a['id'] !== 2) : ?>
                   <a href="supprimer.php?id=<?= (int)$a['id'] ?>" class="btn btn-danger btn-sm">Supprimer</a>
                 <?php endif; ?>
               </td>
