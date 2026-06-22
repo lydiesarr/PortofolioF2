@@ -1,65 +1,20 @@
 <?php
-require 'fonctions.php';
+require_once 'config/connexion.php';
+require_once 'fonctions.php';
+enregistrer_visite($pdo, 'projets');
 
-$projets = [
-  [
-    'num'          => '01',
-    'titre'        => 'TechEdu',
-    'description'  => 'Projet de groupe pour la création d\'une école de formation technologique dédiée à l\'excellence académique et professionnelle en Afrique.',
-    'technologies' => ['HTML', 'CSS', 'Groupe'],
-  ],
-  [
-    'num'          => '02',
-    'titre'        => 'ESTM',
-    'description'  => 'Projet solo axé sur la maîtrise des balises HTML. Site de promotion de mon école pour lui donner plus de visibilité auprès des collèges et lycées.',
-    'technologies' => ['HTML', 'CSS', 'Solo'],
-  ],
-  [
-    'num'          => '03',
-    'titre'        => 'Projet Fédérations',
-    'description'  => 'Projet entrepreneurial combinant administration réseau et développement pour résoudre des problématiques complexes de flux de données.',
-    'technologies' => ['HTML', 'CSS', 'JavaScript', 'PHP'],
-  ],
-  [
-    'num'          => '04',
-    'titre'        => 'Site Soins Capillaires',
-    'description'  => 'Conçu de A à Z comme terrain d\'entraînement. Transformer une thématique esthétique en une interface fluide.',
-    'technologies' => ['HTML', 'CSS', 'JavaScript'],
-  ],
-  [
-    'num'          => '05',
-    'titre'        => 'Site Gourmandise',
-    'description'  => 'Solution métier complète pour un commerce local. Focus sur l\'architecture d\'information et la fluidité de navigation.',
-    'technologies' => ['HTML', 'CSS', 'JavaScript'],
-  ],
-  [
-    'num'          => '06',
-    'titre'        => 'Club des Jeunes Filles',
-    'description'  => 'Association qui défend les droits de la femme et lutte contre les violences faites aux femmes et aux filles.',
-    'technologies' => ['Groupe', 'Association'],
-  ],
-  [
-    'num'          => '07',
-    'titre'        => 'Porte-parole',
-    'description'  => 'Élue porte-parole du gouvernement scolaire. Développement de la confiance en soi et de la prise de parole en public.',
-    'technologies' => ['Groupe', 'École', 'Gouvernement'],
-  ],
-];
-
-$mot_cle = nettoyer($_GET['q'] ?? '');
-$resultats = [];
+$mot_cle = trim($_GET['q'] ?? '');
 
 if ($mot_cle !== '') {
-  foreach ($projets as $projet) {
-    if (stripos($projet['titre'], $mot_cle) !== false ||
-        stripos($projet['description'], $mot_cle) !== false ||
-        in_array(strtolower($mot_cle), array_map('strtolower', $projet['technologies']))) {
-      $resultats[] = $projet;
-    }
-  }
+    $stmt = $pdo->prepare(
+        'SELECT * FROM projets WHERE titre LIKE :q OR description LIKE :q ORDER BY date_creation DESC'
+    );
+    $stmt->execute([':q' => '%' . $mot_cle . '%']);
 } else {
-  $resultats = $projets;
+    $stmt = $pdo->query('SELECT * FROM projets ORDER BY date_creation DESC');
 }
+$projets   = $stmt->fetchAll();
+$resultats = $projets;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -79,18 +34,27 @@ if ($mot_cle !== '') {
     <h2 class="fade-up d1">Ce que j'ai réalisé</h2>
 
     <div class="projects-grid fade-up d2">
-      <?php foreach ($projets as $projet) : ?>
+      <?php foreach ($projets as $i => $projet) : ?>
       <div class="project-card">
-        <div class="project-num"><?= htmlspecialchars($projet['num']) ?></div>
+        <?php if (!empty($projet['image'])) : ?>
+          <img src="images/projets/<?= htmlspecialchars($projet['image']) ?>" alt="<?= htmlspecialchars($projet['titre']) ?>" style="width:100%;border-radius:8px;margin-bottom:12px;object-fit:cover;max-height:160px;"/>
+        <?php endif; ?>
+        <div class="project-num"><?= str_pad($i + 1, 2, '0', STR_PAD_LEFT) ?></div>
         <h3><?= htmlspecialchars($projet['titre']) ?></h3>
         <p><?= htmlspecialchars($projet['description']) ?></p>
         <div class="project-techs">
-          <?php foreach ($projet['technologies'] as $tech) : ?>
-            <span class="tech"><?= htmlspecialchars($tech) ?></span>
+          <?php foreach (explode(',', $projet['technologies']) as $tech) : ?>
+            <span class="tech"><?= htmlspecialchars(trim($tech)) ?></span>
           <?php endforeach; ?>
         </div>
+        <?php if (!empty($projet['lien'])) : ?>
+          <a href="<?= htmlspecialchars($projet['lien']) ?>" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:12px;font-size:.85rem;">Voir le projet</a>
+        <?php endif; ?>
       </div>
       <?php endforeach; ?>
+      <?php if (empty($projets)) : ?>
+        <p style="color:var(--muted);">Aucun projet à afficher pour l'instant.</p>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -100,12 +64,7 @@ if ($mot_cle !== '') {
 
     <form method="GET" action="projets.php" class="fade-up d2" style="margin-bottom:28px; display:flex; gap:12px; max-width:500px;">
       <div class="form-group" style="flex:1; margin:0;">
-        <input
-          type="text"
-          name="q"
-          placeholder="Rechercher un projet..."
-          value="<?= htmlspecialchars($mot_cle) ?>"
-        />
+        <input type="text" name="q" placeholder="Rechercher un projet..." value="<?= htmlspecialchars($mot_cle) ?>"/>
       </div>
       <button type="submit" class="btn" style="white-space:nowrap;">Rechercher</button>
       <?php if ($mot_cle !== '') : ?>
@@ -113,16 +72,6 @@ if ($mot_cle !== '') {
       <?php endif; ?>
     </form>
 
-    <div class="search-tags fade-up d2">
-      <a href="projets.php" class="search-tag">Tous</a>
-      <a href="projets.php?q=HTML" class="search-tag">HTML</a>
-      <a href="projets.php?q=CSS" class="search-tag">CSS</a>
-      <a href="projets.php?q=JavaScript" class="search-tag">JavaScript</a>
-      <a href="projets.php?q=PHP" class="search-tag">PHP</a>
-      <a href="projets.php?q=Solo" class="search-tag">Solo</a>
-      <a href="projets.php?q=Groupe" class="search-tag">Groupe</a>
-      <a href="projets.php?q=Association" class="search-tag">Association</a>
-    </div>
     <?php if ($mot_cle !== '') : ?>
       <p style="color:var(--muted); margin-bottom:20px;">
         <?= count($resultats) ?> résultat(s) pour "<strong><?= htmlspecialchars($mot_cle) ?></strong>"
@@ -132,7 +81,7 @@ if ($mot_cle !== '') {
     <?php if (!empty($resultats)) : ?>
       <?php foreach ($resultats as $projet) : ?>
       <div class="projet-result fade-up">
-        <div class="projet-num-small"><?= htmlspecialchars($projet['num']) ?> — <?= implode(' · ', array_map('htmlspecialchars', $projet['technologies'])) ?></div>
+        <div class="projet-num-small"><?= htmlspecialchars($projet['technologies']) ?></div>
         <h3><?= htmlspecialchars($projet['titre']) ?></h3>
         <p><?= htmlspecialchars($projet['description']) ?></p>
       </div>

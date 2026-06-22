@@ -1,6 +1,11 @@
 <?php
-require 'fonctions.php';
-
+require_once 'config/connexion.php';
+require_once 'fonctions.php';
+enregistrer_visite($pdo, 'contact');
+session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 $erreurs_contact = [];
 $succes_contact  = false;
 $nom_c    = '';
@@ -8,6 +13,10 @@ $email_c  = '';
 $message_c = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_contact'])) {
+  if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+      die('Token CSRF invalide.');
+  }
+
   $nom_c     = nettoyer($_POST['nom'] ?? '');
   $email_c   = nettoyer($_POST['email'] ?? '');
   $message_c = nettoyer($_POST['message'] ?? '');
@@ -17,8 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_contact'])) {
   if (!champ_requis($message_c))  $erreurs_contact[] = 'Le message ne peut pas être vide.';
 
   if (empty($erreurs_contact)) {
-    $succes_contact = true;
-    $nom_c = $email_c = $message_c = '';
+      $stmt = $pdo->prepare('INSERT INTO messages_contact (nom, email, message) VALUES (:nom, :email, :message)');
+      $stmt->execute([':nom' => $nom_c, ':email' => $email_c, ':message' => $message_c]);
+      $succes_contact = true;
+      $nom_c = $email_c = $message_c = '';
   }
 }
 
@@ -27,6 +38,10 @@ $succes_projet  = false;
 $demande        = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_projet'])) {
+  if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+      die('Token CSRF invalide.');
+  }
+
   $demande = [
     'nom'         => nettoyer($_POST['nom_p'] ?? ''),
     'email'       => nettoyer($_POST['email_p'] ?? ''),
@@ -41,6 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_projet'])) {
   if (!champ_requis($demande['description'])) $erreurs_projet[] = 'La description est obligatoire.';
 
   if (empty($erreurs_projet)) {
+    $stmt = $pdo->prepare('INSERT INTO demandes_projet (nom, email, type_projet, budget, description) VALUES (:nom, :email, :type_projet, :budget, :description)');
+    $stmt->execute([
+      ':nom'         => $demande['nom'],
+      ':email'       => $demande['email'],
+      ':type_projet' => $demande['type_projet'],
+      ':budget'      => $demande['budget'],
+      ':description' => $demande['description'],
+    ]);
     $succes_projet = true;
   }
 }
@@ -82,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_projet'])) {
     <div class="contact-grid fade-up d3">
       <form class="contact-form" method="POST" action="contact.php">
         <input type="hidden" name="form_contact" value="1"/>
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"/>
         <div class="form-group">
           <label>Nom</label>
           <input type="text" name="nom" placeholder="Victor Diagne" value="<?= htmlspecialchars($nom_c) ?>" required/>
@@ -157,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_projet'])) {
     <?php if (!$succes_projet) : ?>
     <form class="contact-form fade-up d3" method="POST" action="contact.php" style="max-width:680px;">
       <input type="hidden" name="form_projet" value="1"/>
+      <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"/>
       <div class="form-group">
         <label>Nom complet</label>
         <input type="text" name="nom_p" placeholder="Ton nom" value="<?= htmlspecialchars($demande['nom'] ?? '') ?>" required/>

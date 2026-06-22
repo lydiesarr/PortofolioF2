@@ -1,3 +1,8 @@
+<?php
+require_once 'config/connexion.php';
+require_once 'fonctions.php';
+enregistrer_visite($pdo, 'videos');
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
