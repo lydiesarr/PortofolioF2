@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Supprimer un administrateur</title>
-  <link rel="stylesheet" href="/portfolio/admin/admin.css"/>
+  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="main">
     <div class="topbar">
       <h1>Supprimer un administrateur</h1>
-      <a href="/portfolio/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
       <div class="form-block">

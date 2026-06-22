@@ -11,7 +11,7 @@ $projets = $pdo->query('SELECT * FROM projets ORDER BY date_creation DESC')->fet
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin · Projets</title>
-  <link rel="stylesheet" href="/portfolio/admin/admin.css"/>
+  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -19,7 +19,7 @@ $projets = $pdo->query('SELECT * FROM projets ORDER BY date_creation DESC')->fet
   <div class="main">
     <div class="topbar">
       <h1>Projets</h1>
-      <a href="/portfolio/admin/deconnexion.php" class="logout">Déconnexion</a>
+      <a href="/PortofolioF2/admin/deconnexion.php" class="logout">Déconnexion</a>
     </div>
     <div class="content">
       <div class="actions">

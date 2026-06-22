@@ -1,5 +1,5 @@
 <?php
 session_start();
 session_destroy();
-header('Location: /portfolio/admin/connexion.php');
+header('Location: /PortofolioF2/admin/connexion.php');
 exit;

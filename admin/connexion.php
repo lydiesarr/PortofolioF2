@@ -3,7 +3,7 @@ require_once '../config/connexion.php';
 session_start();
 
 if (!empty($_SESSION['admin_id'])) {
-    header('Location: /portfolio/admin/dashboard.php');
+    header('Location: /PortofolioF2/admin/dashboard.php');
     exit;
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_regenerate_id(true);
         $_SESSION['admin_id']     = $admin['id'];
         $_SESSION['admin_prenom'] = $admin['prenom'];
-        header('Location: /portfolio/admin/dashboard.php');
+        header('Location: /PortofolioF2/admin/dashboard.php');
         exit;
     } else {
         $erreur = 'Identifiants incorrects.';
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Administration · Connexion</title>
-  <link rel="stylesheet" href="/portfolio/admin/admin.css"/>
+  <link rel="stylesheet" href="/PortofolioF2/admin/admin.css"/>
   <style>
     body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#f0f2f5; }
     .login-box { background:#fff; border-radius:16px; padding:48px; width:100%; max-width:400px; box-shadow:0 4px 24px rgba(0,0,0,.1); }
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($erreur) : ?>
       <div class="alert alert-error"><?= htmlspecialchars($erreur) ?></div>
     <?php endif; ?>
-    <form method="POST" action="/portfolio/admin/connexion.php">
+    <form method="POST" action="/PortofolioF2/admin/connexion.php">
       <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"/>
       <div class="form-group">
         <label>Email</label>

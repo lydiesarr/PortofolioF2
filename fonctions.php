@@ -26,7 +26,7 @@ function verifier_session_admin(): void {
         session_start();
     }
     if (empty($_SESSION['admin_id'])) {
-        header('Location: /portfolio/admin/connexion.php');
+        header('Location: /PortofolioF2/admin/connexion.php');
         exit;
     }
 }
